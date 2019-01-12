@@ -1,0 +1,4 @@
+node_modules/
+
+# Ignore test config files
+test/console-config.json

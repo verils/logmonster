@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://cdn.bootcss.com/semantic-ui/2.3.1/semantic.min.css" rel="stylesheet">
+  <title>Console - Logmonster</title>
+  <style>
+  html {
+    font-family: "Menlo", "DejaVu Sans Mono", "Liberation Mono", "Consolas", "Ubuntu Mono", "Courier New", "andale mono", "lucida console", monospace;
+  }
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  pre code {
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+  <!-- <div class="ui secondary attached segment" style="display: none;">
+    <span id="serverInfo"></span>
+  </div> -->
+  <div class="ui inverted attached code segment">
+    <pre><div class="ui tiny inline loader"></div><code id="console"></code></pre>
+  </div>
+  <script src="/js/console.js"></script>
+  <script>
+    var logConsole = new LogConsole('#console');
+    var config = getConfig(location.pathname);
+    if (config) {
+      fetch('/api/console/open', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=utf-8' },
+        body: JSON.stringify(config)
+      }).then(function(res) {
+        if (res.ok) {
+          res.json().then(function(json) {
+            if (json.success) {
+              trace(json.job, 0);
+            }
+          });
+        }
+        if (res.status === 404) {
+          logConsole.append('Resource not found.');
+        }
+        if (res.status === 500) {
+          res.json().then(function(json) {
+            logConsole.append(json.message);
+          })
+        }
+      })
+    }
+
+    function getConfig(pathname) {
+      var resource = null;
+      try {
+        resource = JSON.parse(localStorage.resource);
+      } catch(e) {}
+      if (resource) {
+        var match = /^\/([\w\-]+)\/([\w\-]+)\/([\w\-]+)\/console$/.exec(pathname);
+        var groupName = match[1];
+        var serverName = match[2];
+        var logName = match[3];
+        for (var group of resource.groups) {
+          if (group.groupName === groupName) {
+            for (var server of group.servers) {
+              if (server.serverName === serverName) {
+                var path = server.logFiles[logName];
+                if (path) {
+                  return {
+                    path: path,
+                    host: server.host,
+                    user: server.username ? server.username : group.username,
+                    pass: server.password ? server.password : group.password
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else {
+        logConsole.append('Resource not found. Go to <a href="/">Index</a> and upload your settings');
+        return;
+      }
+    }
+
+    function trace(jobId, offset) {
+      fetch('/api/console/' + jobId + '/trace?offset=' + offset).then(function(res) {
+        return res.text();
+      }).then(function(text) {
+        var isAttached = isAttachedBottom();
+        logConsole.append(text);
+        isAttached && attachBottom();
+      }).then(function() {
+        setTimeout(trace, 1500, jobId, logConsole.length());
+      })
+    }
+
+    var initialized = false;
+    function isAttachedBottom() {
+      var clientHeight = document.documentElement.clientHeight;
+      var scrollHeight = document.documentElement.scrollHeight;
+      var scrollTop = document.documentElement.scrollTop;
+      if (scrollHeight > clientHeight) {
+        if (initialized) {
+          var scrollBottom = scrollHeight - scrollTop - clientHeight;
+          return Math.abs(scrollBottom) <= 1.2;
+        } else {
+          initialized = true;
+          return true;
+        }
+      }
+      return false;
+    }
+    function attachBottom () {
+      window.scrollTo(0, document.documentElement.scrollHeight);
+    };
+  </script>
+</body>
+</html>

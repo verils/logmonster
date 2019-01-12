@@ -1,0 +1,9 @@
+groups:
+- groupName: test
+  servers:
+  - serverName: localhost
+    host: localhost
+    username: logmonster
+    password: logmonster
+    logFiles:
+      auth: /var/log/auth.log
