@@ -2,15 +2,13 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const consoleRouter = require('./app/console-router');
-const consoleApiRouter = require('./app/console-api-router');
+const route = require('./app/route');
 
 const app = express();
 app.use(bodyParser.json());
 
 app.use(express.static('public'));
-app.use(consoleRouter);
-app.use('/api/console', consoleApiRouter);
+app.use(route);
 
 app.use(function(err, req, res, next) {
   console.error(err.stack);

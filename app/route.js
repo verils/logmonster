@@ -1,9 +1,15 @@
 const express = require('express');
 const router = express.Router();
 
-const logConsole = require('./console-service');
+const logConsole = require('./console');
 
-router.post('/open', function(req, res) {
+router.get('/:group/:server/:file/console', function(req, res) {
+  res.sendFile('console.html', {
+    root: __dirname + '/../public'
+  });
+});
+
+router.post('/api/console/open', function(req, res) {
   let id = logConsole.open(req.body);
   res.send({
     success: true,
@@ -11,7 +17,7 @@ router.post('/open', function(req, res) {
   });
 });
 
-router.get('/:id/trace', function(req, res) {
+router.get('/api/console/:id/trace', function(req, res) {
   let id = req.params.id;
   let offset = req.query.offset;
   let log = logConsole.trace(id, offset);
