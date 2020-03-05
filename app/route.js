@@ -3,7 +3,7 @@ const router = express.Router();
 
 const logConsole = require('./console');
 
-router.get('/:group/:server/:file/console', function(req, res) {
+router.get('/:server/:target/console', function(req, res) {
   res.sendFile('console.html', {
     root: __dirname + '/../public'
   });
