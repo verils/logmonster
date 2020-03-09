@@ -1,13 +1,13 @@
-const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const route = require('./app/route');
+const route = require('./app/console-route');
 
 const app = express();
-app.use(bodyParser.json());
 
-app.use(express.static('public'));
+app.use(express.static('./public'));
+
+app.use(bodyParser.json());
 app.use(route);
 
 app.use(function(err, req, res, next) {
@@ -16,5 +16,6 @@ app.use(function(err, req, res, next) {
   res.send({
     message: err.message
   });
-})
+});
+
 module.exports = app;

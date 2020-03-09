@@ -1,0 +1,11 @@
+version: '1'
+hosts:
+  local-docker:
+    description: 'The local docker host'
+    host: docker.local
+    user: 'vagrant'
+    private_key: ''
+targets:
+  sshd-service-log:
+    host: dev-infra
+    file: '/var/log/auth.log'

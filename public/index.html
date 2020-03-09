@@ -39,13 +39,12 @@
           </div>
         </div>
         <div class="ui basic center aligned segment" v-else>
-          <p>You haven't set any available resources, click <a href="javascript:;" @click="setting">here</a> to upload your configurations, or see <a href="template.yml" download>template</a> first.</p>
+          <p>You haven't set any available resources, click <a href="javascript:" @click="setting">here</a> to upload your configurations, or see <a href="../template.yml" download>template</a> first.</p>
         </div>
       </div>
     </div>
   </div>
   <script src="/js/vue.min.js"></script>
-  <script src="/js/js-yaml.min.js"></script>
   <script>
     var resource = null;
     try {

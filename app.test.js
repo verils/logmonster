@@ -1,5 +1,5 @@
-var request = require('supertest');
-var app = require('../app.js');
+const request = require('supertest');
+const app = require('./app.js');
 
 describe('GET /', function () {
   it('response with index page', function (done) {
