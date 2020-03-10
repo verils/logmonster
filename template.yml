@@ -3,8 +3,8 @@ hosts:
   local-docker:
     description: 'The local docker host'
     host: docker.local
-    user: 'vagrant'
-    private_key: |
+    username: 'vagrant'
+    privateKey: |
       -----BEGIN PRIVATE KEY-----
       ...
       -----END PRIVATE KEY-----
@@ -12,3 +12,4 @@ targets:
   sshd-service-log:
     host: local-docker
     file: '/var/log/auth.log'
+    sudo: false
