@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const yaml = require('js-yaml');
 const express = require('express');
 const router = express.Router();
@@ -8,23 +9,41 @@ let doc;
 try {
   doc = yaml.load(fs.readFileSync('./template.yml'));
 } catch (e) {
-  console.log(e)
+  console.log(e);
+  throw e
 }
 
-router.get('/api/sse/console/:target', function (req, res) {
-  let target = doc.targets[(req.params.target)];
-  let host = doc.hosts[target.host];
+router.get('/console/:target', function (req, res) {
+  res.sendFile('console.html', {
+    root: path.join(__dirname, '../public')
+  })
+});
 
+router.get('/api/sse/console/:target', function (req, res) {
   res.writeHead(200, {
     'Connection': 'keep-alive',
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache'
   });
 
-  function sendLog(data) {
+  function sendMessage(event, data) {
     res.write(`id: ${Date.now()}\n`);
-    res.write('event: log\n');
+    res.write(`event: ${event}\n`);
     res.write(`data: ${data}\n\n`)
+  }
+
+  let targetName = req.params.target;
+  let target = doc.targets[(targetName)];
+  if (!target) {
+    sendMessage('error', `target not found: '${targetName}'`);
+    return
+  }
+
+  let hostname = target.host;
+  let host = doc.hosts[hostname];
+  if (!host) {
+    sendMessage('error', `host not found: '${hostname}'`);
+    return
   }
 
   let cmd = `${target.sudo ? 'sudo ' : ''}tail -f ${target.file}`;
@@ -38,14 +57,14 @@ router.get('/api/sse/console/:target', function (req, res) {
         conn.end();
       }
       stream.on('data', (data) => {
-        sendLog(data.toString())
+        sendMessage('log', data.toString())
       }).stderr.on('data', (data) => {
-        sendLog(data.toString())
+        sendMessage('log', data.toString())
       }).on('close', () => conn.end());
     });
   }).on('error', (err) => {
     console.error(err);
-    sendLog(err);
+    sendMessage('error', err);
     conn.end();
   }).connect({
     host: host.host,

@@ -25,16 +25,19 @@
 </div>
 <script src="/js/console.js"></script>
 <script>
+  let target = /\/console\/([a-zA-Z0-9-]+)/.exec(location.pathname)[1];
+
   var logConsole = new LogConsole('#console');
 
   // EventSource
-  const sse = new EventSource('/api/sse/console/sshd-log');
+  const sse = new EventSource(`/api/sse/console/${target}`);
   sse.addEventListener('log', function (e) {
     let isAttached = isAttachedBottom();
     logConsole.append(e.data);
     isAttached && attachBottom();
   });
   sse.addEventListener('error', function (e) {
+    logConsole.appendError(e.data || 'connection failed');
     sse.close();
   });
 

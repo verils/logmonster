@@ -3,10 +3,14 @@ function LogConsole(el) {
     this.console = document.getElementById(el.substring(1));
   }
 }
-LogConsole.prototype.append = function(text) {
+
+LogConsole.prototype.append = function (text) {
   text = text.replace(/(DEBUG)/ig, '<span style="color: #A333C8;">$1</span>');
   text = text.replace(/(INFO)/ig, '<span style="color: #2185D0;"">$1</span>');
   text = text.replace(/(WARN|WARNING)/ig, '<span style="color: #F2711C;">$1</span>');
   text = text.replace(/(ERROR)/ig, '<span style="color: #DB2828;">$1</span>');
   this.console.innerHTML += `${text}\n`;
+};
+LogConsole.prototype.appendError = function (text) {
+  this.console.innerHTML += `<span style="color: #DB2828;">${text}</span>\n`;
 };
