@@ -4,8 +4,11 @@ hosts:
     description: 'The local docker host'
     host: docker.local
     user: 'vagrant'
-    private_key: ''
+    private_key: |
+      -----BEGIN PRIVATE KEY-----
+      ...
+      -----END PRIVATE KEY-----
 targets:
   sshd-service-log:
-    host: dev-infra
+    host: local-docker
     file: '/var/log/auth.log'
