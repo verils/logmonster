@@ -8,6 +8,10 @@
       font-family: "Menlo", "DejaVu Sans Mono", "Liberation Mono", "Consolas", "Ubuntu Mono", "Courier New", "andale mono", "lucida console", monospace;
     }
 
+    body > div {
+      min-height: 100%;
+    }
+
     pre {
       margin: 0;
       white-space: pre-wrap;
@@ -21,7 +25,7 @@
 </head>
 <body>
 <div class="ui inverted attached code segment">
-  <pre><div class="ui tiny inline loader"></div><code id="console"></code></pre>
+  <pre><code id="console"></code></pre>
 </div>
 <script src="/js/console.js"></script>
 <script>
