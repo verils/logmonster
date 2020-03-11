@@ -1,14 +1,16 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const route = require('./app/console-route');
+const indexRoute = require('./app/index-route');
+const consoleRoute = require('./app/console-route');
 
 const app = express();
 
 app.use(express.static('./public'));
 
 app.use(bodyParser.json());
-app.use(route);
+app.use(indexRoute);
+app.use(consoleRoute);
 
 app.use(function(err, req, res, next) {
   console.error(err.stack);

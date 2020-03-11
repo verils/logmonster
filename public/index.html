@@ -6,78 +6,37 @@
   <title>Home - Logmonster</title>
 </head>
 <body>
-  <div id="app">
-    <div class="ui vertical clearing segment" style="margin-bottom: 14px;">
-      <div class="ui container">
-        <div class="ui primary basic right floated button" @click="setting">Settings</div>
-      </div>
+<div id="app">
+  <div class="ui vertical clearing segment" style="margin-bottom: 14px;">
+    <div class="ui container">
+      <span>Logmonster</span>
     </div>
-    <div>
-      <div class="ui container">
-        <div class="ui segments" v-if="resource">
-          <div class="ui attached segment" v-for="group in resource.groups">
-            <h4 class="ui header">
-              <i class="folder open outline icon"></i><div class="content">{{group.groupName}}</div>
-            </h4>
-            <div class="ui segments">
-              <div class="ui segment" v-for="server in group.servers">
-                <div class="content">
-                  <h5 class="ui header">
-                    <i class="server icon"></i><div class="content">{{server.serverName + ' - ' + server.host}}</div>
-                  </h5>
-                  <div class="description">
-                    <ul class="ui list">
-                      <li v-for="(value, key) in server.logFiles">
-                        <span>{{key + ' - '}}</span>
-                        <a target="_blank" :href="group.groupName + '/' + server.serverName + '/' + key + '/console'" @click="openConsole(logFile.path, server, group)">{{value}}</a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
+  </div>
+  <div>
+    <div class="ui container">
+      <div class="ui segments" v-if="targets">
+        <div class="ui segment" v-for="(target, name) in targets">
+          <div class="content">
+            <a target="_blank" :href="'/console/' + name">{{name}}</a>
           </div>
         </div>
-        <div class="ui basic center aligned segment" v-else>
-          <p>You haven't set any available resources, click <a href="javascript:" @click="setting">here</a> to upload your configurations, or see <a href="../template.yml" download>template</a> first.</p>
-        </div>
+      </div>
+      <div class="ui basic center aligned segment" v-else>
+        <p>You haven't set any available resources.</p>
       </div>
     </div>
   </div>
-  <script src="/js/vue.min.js"></script>
-  <script>
-    var resource = null;
-    try {
-      resource = JSON.parse(localStorage.resource);
-    } catch(e) {}
-    var app = new Vue({
-      el: '#app',
-      data: {
-        resource: resource
-      },
-      methods: {
-        setting: function() {
-          var fileField = document.createElement('input');
-          fileField.type = 'file';
-          fileField.addEventListener('change', function(e) {
-            var file = fileField.files[0];
-            var fileReader = new FileReader();
-            fileReader.addEventListener('load', function(e) {
-              var content = fileReader.result;
-              try {
-                var resource = jsyaml.load(content);
-                app.resource = resource;
-                localStorage.resource = JSON.stringify(resource);
-              } catch(e) {
-                console.error(e);
-              }
-            });
-            fileReader.readAsText(file);
-          });
-          fileField.click();
-        }
-      }
-    });
-  </script>
+</div>
+<script src="/js/vue.min.js"></script>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      targets: {}
+    }
+  });
+
+  fetch('/targets').then(r => r.json()).then(j => app.targets = j);
+</script>
 </body>
 </html>

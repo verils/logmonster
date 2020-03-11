@@ -1,17 +1,8 @@
-const fs = require('fs');
 const path = require('path');
-const yaml = require('js-yaml');
 const express = require('express');
 const router = express.Router();
 const Client = require('ssh2').Client;
-
-let doc;
-try {
-  doc = yaml.load(fs.readFileSync('./template.yml'));
-} catch (e) {
-  console.log(e);
-  throw e
-}
+const resource = require('./resource');
 
 router.get('/console/:target', function (req, res) {
   res.sendFile('console.html', {
@@ -26,21 +17,28 @@ router.get('/api/sse/console/:target', function (req, res) {
     'Cache-Control': 'no-cache'
   });
 
-  function sendMessage(event, data) {
-    res.write(`id: ${Date.now()}\n`);
+  let eventId = 1;
+
+  function sendMessage(event, text) {
+    let lines = text.split('\n');
+    lines.pop();
+
+    let data = JSON.stringify(lines);
+
+    res.write(`id: ${eventId++}\n`);
     res.write(`event: ${event}\n`);
     res.write(`data: ${data}\n\n`)
   }
 
   let targetName = req.params.target;
-  let target = doc.targets[(targetName)];
+  let target = resource.targets[(targetName)];
   if (!target) {
     sendMessage('error', `target not found: '${targetName}'`);
     return
   }
 
   let hostname = target.host;
-  let host = doc.hosts[hostname];
+  let host = resource.hosts[hostname];
   if (!host) {
     sendMessage('error', `host not found: '${hostname}'`);
     return
@@ -78,17 +76,19 @@ router.get('/api/sse/console/:target', function (req, res) {
   conn.on('ready', () => {
     conn.exec(cmd, (err, stream) => {
       if (err) {
-        console.error(err);
+        console.error('command execute failed: ', err);
         conn.end();
       }
-      stream.on('data', (data) => {
-        sendMessage('log', data.toString())
-      }).stderr.on('data', (data) => {
-        sendMessage('log', data.toString())
-      }).on('close', () => conn.end());
+
+      function onData(data) {
+        sendMessage('log', data.toString());
+      }
+
+      stream.on('data', onData).stderr.on('data', onData)
+        .on('close', () => conn.end());
     });
   }).on('error', (err) => {
-    console.error(err);
+    console.error('connection error: ', err);
     sendMessage('error', err);
     conn.end();
   }).connect(options);
