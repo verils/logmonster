@@ -46,10 +46,35 @@ router.get('/api/sse/console/:target', function (req, res) {
     return
   }
 
-  let cmd = `${target.sudo ? 'sudo ' : ''}tail -f ${target.file}`;
+  let cmd;
+  if (target.docker) {
+    cmd = `docker logs -f ${target.docker}`
+  } else if (target.file) {
+    cmd = `${target.sudo ? 'sudo ' : ''}tail -f ${target.file}`
+  } else {
+    sendMessage('error', `target invalid`);
+    return;
+  }
+
+  let options;
+  if (host.privateKey) {
+    options = {
+      host: host.host,
+      username: host.username,
+      privateKey: Buffer.from(host.privateKey, 'utf-8')
+    };
+  } else if (host.password) {
+    options = {
+      host: host.host,
+      username: host.username,
+      password: host.password
+    };
+  } else {
+    sendMessage('error', `host credentials invalid`);
+    return;
+  }
 
   let conn = new Client();
-  let privateKey = Buffer.from(host.privateKey, 'utf-8');
   conn.on('ready', () => {
     conn.exec(cmd, (err, stream) => {
       if (err) {
@@ -66,11 +91,7 @@ router.get('/api/sse/console/:target', function (req, res) {
     console.error(err);
     sendMessage('error', err);
     conn.end();
-  }).connect({
-    host: host.host,
-    username: host.username,
-    privateKey: privateKey
-  });
+  }).connect(options);
 });
 
 module.exports = router;
