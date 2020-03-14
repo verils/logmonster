@@ -76,7 +76,12 @@ router.get('/api/sse/console/:target', function (req, res) {
       }
 
       function onData(data) {
-        sendMessage('log', data.toString());
+        let text = data.toString();
+        let lines = text.split('\n');
+        lines.pop();
+        for (let line of lines) {
+          sendMessage('log', text);
+        }
       }
 
       stream.on('data', onData).stderr.on('data', onData)
