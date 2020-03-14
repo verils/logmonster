@@ -21,6 +21,10 @@
     pre code {
       font-size: 12px;
     }
+
+    pre code p {
+      margin: 0;
+    }
   </style>
 </head>
 <body>
@@ -37,8 +41,7 @@
   const sse = new EventSource(`/api/sse/console/${target}`);
   sse.addEventListener('log', function (e) {
     let isAttached = isAttachedBottom();
-    let data = JSON.parse(e.data);
-    logConsole.append(data);
+    logConsole.append(e.data);
     isAttached && attachBottom();
   });
   sse.addEventListener('error', function (e) {

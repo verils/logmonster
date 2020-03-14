@@ -19,12 +19,7 @@ router.get('/api/sse/console/:target', function (req, res) {
 
   let eventId = 1;
 
-  function sendMessage(event, text) {
-    let lines = text.split('\n');
-    lines.pop();
-
-    let data = JSON.stringify(lines);
-
+  function sendMessage(event, data) {
     res.write(`id: ${eventId++}\n`);
     res.write(`event: ${event}\n`);
     res.write(`data: ${data}\n\n`)

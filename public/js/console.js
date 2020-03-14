@@ -18,13 +18,13 @@ function highlight(text) {
 }
 
 LogConsole.prototype.append = function (data) {
-  let html = '';
-  for (let line of data) {
-    line = escapeHtml(line);
-    line = highlight(line);
-    html += `${line}\n`
-  }
-  this.console.innerHTML += html;
+  data = escapeHtml(data);
+  data = highlight(data);
+
+  let element = document.createElement('p');
+  element.innerText = data;
+
+  this.console.appendChild(element);
 };
 LogConsole.prototype.appendError = function (text) {
   this.console.innerHTML += `<span style="color: #DB2828;">${text}</span>\n`;
