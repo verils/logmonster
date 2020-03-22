@@ -1,8 +1,7 @@
 const express = require('express');
 const path = require('path');
 
-const indexRouter = require('./app/index-route');
-const consoleRouter = require('./app/console-route');
+const config = require('./app/config');
 
 const app = express();
 
@@ -12,12 +11,13 @@ app.use(express.static(path.join(__dirname, './public')));
 app.use(function (err, req, res, next) {
   console.error(err.stack);
   res.status(err.status || 500);
-  res.send({
-    message: err.message
-  });
+  res.send({message: err.message});
 });
 
-app.use(indexRouter);
-app.use(consoleRouter);
+app.use(require('./routes'));
+
+app.use('/api/hosts', require('./routes/api/hosts')(config));
+app.use('/api/targets', require('./routes/api/targets')(config));
+app.use('/api/console', require('./routes/api/console')(config));
 
 module.exports = app;

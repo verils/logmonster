@@ -15,10 +15,10 @@
   <div>
     <div class="ui container">
       <div class="ui segments" v-if="targets">
-        <div class="ui segment" v-for="(target, name) in targets">
+        <div class="ui segment" v-for="(target, _) in targets">
           <div class="content">
             <span style="float: right;">{{target.host}}</span>
-            <a target="_blank" :href="'/console/' + name">{{name}}</a>
+            <a target="_blank" :href="'/console/' + target.name">{{target.name}}</a>
           </div>
         </div>
       </div>
@@ -37,7 +37,7 @@
     }
   });
 
-  fetch('/targets').then(r => r.json()).then(j => app.targets = j);
+  fetch('/api/targets').then(r => r.json()).then(j => app.targets = j);
 </script>
 </body>
 </html>
