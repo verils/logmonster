@@ -18,6 +18,5 @@ app.use(require('./routes'));
 
 app.use('/api/hosts', require('./routes/api/hosts')(config));
 app.use('/api/targets', require('./routes/api/targets')(config));
-app.use('/api/console', require('./routes/api/console')(config));
 
 module.exports = app;
