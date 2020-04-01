@@ -18,7 +18,7 @@
         <div class="ui segment" v-for="(target, _) in targets">
           <div class="content">
             <span style="float: right;">{{target.host}}</span>
-            <a target="_blank" :href="'/console/' + target.name">{{target.name}}</a>
+            <a target="_blank" :href="`/targets/${target.name}/console`">{{target.name}}</a>
           </div>
         </div>
       </div>

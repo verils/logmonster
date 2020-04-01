@@ -8,7 +8,7 @@ router.get('/', function (req, res) {
   res.sendFile('index.html', {root})
 });
 
-router.get('/console/:target', function (req, res) {
+router.get('/targets/:target/console', function (req, res) {
   res.sendFile('console.html', {root})
 });
 
