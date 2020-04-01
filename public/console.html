@@ -38,7 +38,7 @@
   const logConsole = new LogConsole('#console');
 
   // EventSource
-  const sse = new EventSource(`/api/console/${target}`);
+  const sse = new EventSource(`/api/console/${target}${location.search}`);
   sse.addEventListener('log', function (e) {
     let isAttached = isAttachedBottom();
     logConsole.append(e.data);

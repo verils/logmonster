@@ -1,4 +1,3 @@
-const path = require('path');
 const express = require('express');
 const Client = require('ssh2').Client;
 
@@ -21,25 +20,30 @@ module.exports = function (config) {
       res.write(`data: ${data}\n\n`)
     }
 
-    let targetName = req.params.target;
-    let target = config.targets[(targetName)];
+    const targetName = req.params.target;
+    const target = config.targets[(targetName)];
     if (!target) {
       sendMessage('error', `target not found: '${targetName}'`);
       return
     }
 
-    let hostname = target.host;
-    let host = config.hosts[hostname];
+    const hostname = target.host;
+    const host = config.hosts[hostname];
     if (!host) {
       sendMessage('error', `host not found: '${hostname}'`);
       return
     }
 
+    const tail = req.query.tail;
+
     let cmd;
     if (target.docker) {
-      cmd = `docker logs -f ${target.docker} 2>&1`
+      let tailOption = tail ? `--tail ${tail}` : '';
+      cmd = `docker logs -f ${tailOption} ${target.docker} 2>&1`
     } else if (target.file) {
-      cmd = `${target.sudo ? 'sudo ' : ''}tail -f ${target.file}`
+      let sudoOption = target.sudo ? 'sudo ' : '';
+      let tailOption = tail ? `-n ${tail}` : '';
+      cmd = `${sudoOption} tail -f ${tailOption} ${target.file}`
     } else {
       sendMessage('error', `target invalid`);
       return;
@@ -63,7 +67,7 @@ module.exports = function (config) {
       return;
     }
 
-    let conn = new Client();
+    const conn = new Client();
     conn.on('ready', () => {
       conn.exec(cmd, (err, stream) => {
         if (err) {
