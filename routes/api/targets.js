@@ -95,20 +95,39 @@ module.exports = function (config) {
           }
 
           const buffer = [];
-          // flush buffer by interval
-          interval = setInterval(() => {
-            while (buffer.length) {
-              let text = buffer.shift();
-              sendMessage('log', text);
-            }
-          }, 300);
+          let missDataCount = 0;
+
+          function startFlushing() {
+            console.log('start flushing buffer');
+            return setInterval(() => {
+              console.log('send message, buffer size: ', buffer.length);
+              while (buffer.length) {
+                let text = buffer.shift();
+                sendMessage('log', text);
+              }
+              missDataCount++;
+              if (missDataCount >= 3) {
+                // pause sending message until data income
+                clearInterval(interval);
+                interval = 0;
+              }
+            }, 150);
+          }
 
           function onData(data) {
+            console.log('data income');
             let text = data.toString();
             let lines = text.split('\n');
             lines.pop();
             buffer.push(...lines);
+            missDataCount = 0;
+            if (interval === 0) {
+              interval = startFlushing();
+            }
           }
+
+          // flush buffer by interval
+          interval = startFlushing();
 
           stream.on('data', onData).stderr.on('data', onData)
             .on('close', () => conn.end());
@@ -118,7 +137,7 @@ module.exports = function (config) {
         sendMessage('error', err);
         conn.end();
       }).on('close', () => {
-        console.log('connection closed: ', err);
+        console.log('connection closed');
         clearInterval(interval);
       }).connect(options);
     });
