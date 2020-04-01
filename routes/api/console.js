@@ -37,7 +37,7 @@ module.exports = function (config) {
 
     let cmd;
     if (target.docker) {
-      cmd = `docker logs -f ${target.docker}`
+      cmd = `docker logs -f ${target.docker} 2>&1`
     } else if (target.file) {
       cmd = `${target.sudo ? 'sudo ' : ''}tail -f ${target.file}`
     } else {
