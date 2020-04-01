@@ -98,16 +98,14 @@ module.exports = function (config) {
           let missDataCount = 0;
 
           function startFlushing() {
-            console.log('start flushing buffer');
             return setInterval(() => {
-              console.log('send message, buffer size: ', buffer.length);
               while (buffer.length) {
                 let text = buffer.shift();
                 sendMessage('log', text);
               }
               missDataCount++;
               if (missDataCount >= 3) {
-                // pause sending message until data income
+                // pause sending message until there is data incoming
                 clearInterval(interval);
                 interval = 0;
               }
@@ -115,7 +113,6 @@ module.exports = function (config) {
           }
 
           function onData(data) {
-            console.log('data income');
             let text = data.toString();
             let lines = text.split('\n');
             lines.pop();
