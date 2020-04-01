@@ -85,6 +85,7 @@ module.exports = function (config) {
         return;
       }
 
+      let interval = 0;
       const conn = new Client();
       conn.on('ready', () => {
         conn.exec(cmd, (err, stream) => {
@@ -93,13 +94,20 @@ module.exports = function (config) {
             conn.end();
           }
 
+          const buffer = [];
+          // flush buffer by interval
+          interval = setInterval(() => {
+            while (buffer.length) {
+              let text = buffer.shift();
+              sendMessage('log', text);
+            }
+          }, 300);
+
           function onData(data) {
             let text = data.toString();
             let lines = text.split('\n');
             lines.pop();
-            for (let line of lines) {
-              sendMessage('log', text);
-            }
+            buffer.push(...lines);
           }
 
           stream.on('data', onData).stderr.on('data', onData)
@@ -109,6 +117,9 @@ module.exports = function (config) {
         console.error('connection error: ', err);
         sendMessage('error', err);
         conn.end();
+      }).on('close', () => {
+        console.log('connection closed: ', err);
+        clearInterval(interval);
       }).connect(options);
     });
 
