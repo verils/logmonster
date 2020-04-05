@@ -14,7 +14,7 @@
   </div>
   <div>
     <div class="ui container">
-      <div class="ui segments" v-if="targets">
+      <div class="ui segments" v-if="targets.length">
         <div class="ui segment" v-for="(target, _) in targets">
           <div class="content">
             <span style="float: right;">{{target.host}}</span>
@@ -33,7 +33,7 @@
   var app = new Vue({
     el: '#app',
     data: {
-      targets: {}
+      targets: []
     }
   });
 
