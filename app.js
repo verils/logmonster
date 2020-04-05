@@ -14,9 +14,9 @@ app.use(function (err, req, res, next) {
   res.send({message: err.message});
 });
 
-app.use(require('./routes'));
+app.use(require('./routes/pages'));
 
-app.use('/api/hosts', require('./routes/api/hosts')(config));
-app.use('/api/targets', require('./routes/api/targets')(config));
+app.use('/api/hosts', require('./routes/hosts')(config));
+app.use('/api/targets', require('./routes/targets')(config));
 
 module.exports = app;
