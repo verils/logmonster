@@ -134,7 +134,6 @@ module.exports = function (config) {
         sendMessage('error', err);
         conn.end();
       }).on('close', () => {
-        console.log('connection closed');
         clearInterval(interval);
       }).connect(options);
     });
