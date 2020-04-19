@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('./app.js');
+const app = require('./index.js');
 
 describe('GET /', function () {
   it('response with index page', function (done) {

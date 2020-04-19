@@ -5,7 +5,7 @@ module.exports = function (config) {
   const router = express.Router();
 
   router.route('/')
-    .get(function (req, res, next) {
+    .get(function (req, res, _) {
       const arr = [];
       const hosts = config.hosts;
       Object.keys(hosts).forEach(name => {
@@ -16,6 +16,9 @@ module.exports = function (config) {
         })
       });
       res.json(arr);
+    })
+    .post(function (req, res) {
+
     });
 
   return router;

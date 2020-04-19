@@ -2,7 +2,7 @@
   "name": "logmonster",
   "version": "0.1.0",
   "description": "log monitoring tool",
-  "main": "app.js",
+  "main": "app/index.js",
   "repository": "",
   "scripts": {
     "start": "node bin/www",
